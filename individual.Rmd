@@ -1,0 +1,102 @@
+---
+title: "Lab 5"
+author: "Elisabeth Balke"
+date: "11/8/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(readxl)
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+
+acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
+Person <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
+vehicle <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/vehicle.csv", stringsAsFactors = FALSE)
+
+```
+
+1. 
+
+```{r}
+Day <- acc%>%
+  group_by(DAY_WEEK)%>%
+  summarise(count=n())%>%
+  mutate(Day=DAY_WEEK[c(1,2,3,4,5,6,7)] <- c("Sunday", "Monday", "Tuesday", "Wednesday","Thursday","Friday","Saturday"))
+
+View(Day)
+
+```
+There are more accidents on Friday through Sunday.
+
+
+2. 
+```{r}
+Fatal <- Person %>%
+  filter(INJ_SEV == 4)
+View(Fatal)
+```
+
+
+
+3. 
+```{r}
+accidents <- full_join(Person, vehicle)
+accidents <- accidents %>%
+  select(STATE, PER_NO, MAKE) %>%
+  group_by(STATE) %>%
+  slice_max(PER_NO, n=1, with_ties = FALSE) %>%
+  arrange(STATE)
+accidents$group = accidents$STATE
+accidents
+```
+
+4. 
+```{r}
+
+```
+Definition: The most dangerous vehicle is the one with the highest count of accidents that have INJ_SEV == 4.
+
+
+5. 
+```{r}
+joinedAP <- full_join(acc, Person)%>%
+  select(STATE, COUNTY, CITY, MONTH, DAY, DAY_WEEK, YEAR, HOUR, MINUTE, LATITUDE, LONGITUD, FATALS, AGE, SEX, INJ_SEV)
+str(joinedAP)
+```
+
+6. 
+```{r}
+ggplot(acc, aes(DAY_WEEK)) + geom_bar()
+
+HOD <- acc %>%
+  filter(HOUR == 1:24)
+ggplot(HOD, aes(HOUR)) + geom_bar()
+
+gender <- Person %>%
+  filter(SEX == 1:2)
+ggplot(gender, aes(SEX)) + geom_bar()
+
+```
+
+
+7. 
+```{r}
+DBC <- Person %>%
+  filter(INJ_SEV == 4) %>%
+  group_by(STATE, COUNTY) %>%
+  summarise(numDeaths = n())
+
+counties <- map_data("county")
+
+```
+Was not able to complete.
+
+8. 
+```{r}
+
+```
+Was not able to complete.
